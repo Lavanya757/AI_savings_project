@@ -1,0 +1,116 @@
+{% extends 'savings/base.html' %}
+
+{% block title %}Edit Expense - AI Savings{% endblock %}
+
+{% block content %}
+<style>
+    .edit-expense-card {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 30px 40px;
+        background: linear-gradient(135deg, #d3af56 0%, #d9c36d 100%);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(255, 65, 92, 0.3);
+        color: #fff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 0.85rem;
+    }
+    .edit-expense-card h2 {
+        font-weight: 900;
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        letter-spacing: 1.5px;
+        text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+    .edit-expense-card h2 svg {
+        vertical-align: middle;
+        margin-right: 8px;
+    }
+    .edit-expense-card form label {
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+        display: block;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .edit-expense-card form input[type="number"],
+    .edit-expense-card form select,
+    .edit-expense-card form textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: none;
+        font-size: 0.95rem;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
+        transition: box-shadow 0.3s ease;
+        resize: vertical;
+    }
+    .edit-expense-card form input[type="number"]:focus,
+    .edit-expense-card form select:focus,
+    .edit-expense-card form textarea:focus {
+        outline: none;
+        box-shadow: 0 0 8px 3px rgba(255, 75, 43, 0.7);
+        background-color: #fff0f0;
+        color: #333;
+    }
+    .edit-expense-card .btn-primary {
+        width: 100%;
+        padding: 12px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-radius: 10px;
+        background-color: #ff4b2b;
+        border: none;
+        box-shadow: 0 5px 15px rgba(255, 75, 43, 0.6);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        margin-top: 1rem;
+    }
+    .edit-expense-card .btn-primary:hover {
+        background-color: #e03e1f;
+        box-shadow: 0 8px 20px rgba(224, 62, 31, 0.8);
+    }
+    .edit-expense-card .btn-secondary {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        border-radius: 10px;
+        margin-top: 0.75rem;
+        background-color: #999;
+        border: none;
+        color: #fff;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        transition: background-color 0.3s ease;
+    }
+    .edit-expense-card .btn-secondary:hover {
+        background-color: #777;
+    }
+</style>
+
+<div class="edit-expense-card">
+    <h2><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-wallet2" viewBox="0 0 16 16">
+        <path d="M12 1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h8zm0 1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z"/>
+        <path d="M2 5h12v2H2V5z"/>
+    </svg>Edit Expense</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="amount">Amount (₹)</label>
+        <input type="number" id="amount" name="amount" required min="0" step="0.01" value="{{ expense_record.amount }}">
+        <label for="category">Category</label>
+        <select id="category" name="category" required>
+            {% for key, value in expense_record.CATEGORY_CHOICES %}
+                <option value="{{ key }}" {% if expense_record.category == key %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+        </select>
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="3">{{ expense_record.description }}</textarea>
+        <button type="submit" class="btn btn-primary">Update Expense</button>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'savings/base.html' %}
+
+{% block title %}Set Savings Goal - AI Savings{% endblock %}
+
+{% block content %}
+<style>
+    .set-goal-card {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 30px 40px;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(56, 239, 125, 0.3);
+        color: #fff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .set-goal-card h2 {
+        font-weight: 900;
+        font-size: 2.25rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        letter-spacing: 1.5px;
+        text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    .set-goal-card form label {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        display: block;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .set-goal-card form input[type="number"],
+    .set-goal-card form input[type="date"] {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: none;
+        font-size: 1.1rem;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
+        transition: box-shadow 0.3s ease;
+    }
+    .set-goal-card form input[type="number"]:focus,
+    .set-goal-card form input[type="date"]:focus {
+        outline: none;
+        box-shadow: 0 0 8px 3px rgba(56, 239, 125, 0.7);
+        background-color: #f0fff6;
+        color: #333;
+    }
+    .set-goal-card .btn-primary {
+        width: 100%;
+        padding: 12px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        border-radius: 10px;
+        background-color: #38ef7d;
+        border: none;
+        box-shadow: 0 5px 15px rgba(56, 239, 125, 0.6);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        margin-top: 1rem;
+        color: #1a1a1a;
+    }
+    .set-goal-card .btn-primary:hover {
+        background-color: #2ecc71;
+        box-shadow: 0 8px 20px rgba(46, 204, 113, 0.8);
+        color: #fff;
+    }
+</style>
+
+<div class="set-goal-card">
+    <h2>Set Your Savings Goal</h2>
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <label for="{{ form.target_amount.id_for_label }}">Target Amount</label>
+        <input type="number" name="{{ form.target_amount.name }}" id="{{ form.target_amount.id_for_label }}" value="{{ form.target_amount.value|default_if_none:'' }}" required />
+        {% if form.target_amount.errors %}
+        <div class="text-danger">{{ form.target_amount.errors }}</div>
+        {% endif %}
+        <label for="{{ form.deadline.id_for_label }}">Deadline</label>
+        <input type="date" name="{{ form.deadline.name }}" id="{{ form.deadline.id_for_label }}" value="{{ form.deadline.value|default_if_none:'' }}" />
+        {% if form.deadline.errors %}
+        <div class="text-danger">{{ form.deadline.errors }}</div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">Set Goal</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "savings/base.html" %}
+{% load static %}
+
+{% block title %}Login - AI Savings{% endblock %}
+
+{% block content %}
+<style>
+    .login-container {
+        min-height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .login-card {
+        max-width: 450px;
+        width: 100%;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        background-color: wheat;
+    }
+    .login-title {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #0eabef;
+        margin-bottom: 0.5rem;
+        text-align: center;
+        font-family: 'Roboto', sans-serif;
+    }
+    .login-subtitle {
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(233, 30, 99, 0.25);
+        border-color: #1c1316;
+    }
+    .btn-login {
+        background-color: #1e28e9;
+        border: none;
+        padding: 0.75rem;
+        width: 100%;
+        border-radius: 8px;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .btn-login:hover, .btn-login:focus {
+        background-color: #1ce38a;
+        box-shadow: 0 4px 12px rgba(194, 24, 91, 0.6);
+    }
+    .form-text a {
+        color: #2b54ea;
+        text-decoration: none;
+    }
+    .form-text a:hover, .form-text a:focus {
+        text-decoration: underline;
+    }
+    .alert-danger {
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-title">AI Savings</div>
+        <div class="login-title">Login</div>
+        <div class="login-subtitle">Don't have an account yet? <a href="{% url 'register' %}">Sign Up</a></div>
+        <form method="POST" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label visually-hidden">Username</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Username" required value="{{ form.username.value|default_if_none:'' }}">
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label visually-hidden">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+            </div>
+            <div class="form-text text-end mb-3">
+                <a href="{% url 'password_reset' %}">Forgot Password?</a>
+            </div>
+            {% if form.errors %}
+            <div class="alert alert-danger">Invalid username or password.</div>
+            {% endif %}
+            <button type="submit" class="btn-login">LOGIN</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

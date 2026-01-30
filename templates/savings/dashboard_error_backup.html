@@ -1,0 +1,110 @@
+{% extends 'savings/base.html' %}
+{% load static %}
+
+{% block title %}AI Savings Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Financial Dashboard</h1>
+</div>
+
+<!-- Alerts -->
+{% for alert in alerts %}
+<div class="alert alert-warning alert-custom" role="alert">
+    {{ alert }}
+</div>
+{% endfor %}
+
+<!-- Financial Overview -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Monthly Income</h5>
+                <p class="card-text">₹{{ financial_data.income|default:"0" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Expenses</h5>
+                <p class="card-text">₹{{ total_expenses|default:"0" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Savings Goal</h5>
+                <p class="card-text">₹{{ savings_goal.target_amount|default:"Not set" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Your Savings</h5>
+                <p class="card-text">₹{{ savings_goal.current_amount|default:"0" }}</p>
+                <a href="{% url 'add_savings' %}" class="btn btn-sm btn-primary mt-2">Add Savings</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Prediction -->
+<div class="card mt-4">
+    <div class="card-body">
+        <h5 class="card-title">AI Savings Recommendation</h5>
+        <p class="savings-prediction">Recommended monthly savings: ₹{{ predicted_savings }}</p>
+        <p class="text-muted">Based on your income and spending patterns</p>
+    </div>
+</div>
+
+<!-- Spending Pattern Chart -->
+<div class="card mt-4">
+    <div class="card-body" style="max-width: 400px; max-height: 300px;">
+        <h5 class="card-title">Spending Patterns</h5>
+        <canvas id="spendingChart"></canvas>
+    </div>
+</div>
+
+<!-- Include Chart.js library -->
+<script src="{% static 'chart.js' %}"></script>
+ 
+{% block extra_scripts %}
+<script>
+    // Initialize spending patterns chart
+    const ctx = document.getElementById('spendingChart').getContext('2d');
+    const spendingData = JSON.parse('{{ spending_patterns|escapejs }}');
+    
+    // Convert spendingData values to numbers for chart
+    const dataValues = Object.values(spendingData).map(value => Number(value));
+    
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(spendingData),
+            datasets: [{
+                data: dataValues,
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

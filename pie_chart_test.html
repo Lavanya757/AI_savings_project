@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Pie Chart Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #chart-container {
+            width: 400px;
+            height: 300px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pie Chart Test</h1>
+    <div id="chart-container">
+        <canvas id="testPieChart" width="400" height="300"></canvas>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('testPieChart').getContext('2d');
+            const data = {
+                labels: ['Groceries', 'Bills', 'Entertainment', 'Transport', 'Other'],
+                datasets: [{
+                    data: [500, 300, 200, 150, 100],
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF'
+                    ]
+                }]
+            };
+            const options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            };
+            const pieChart = new Chart(ctx, {
+                type: 'pie',
+                data: data,
+                options: options
+            });
+            console.log('Test pie chart created:', pieChart);
+        });
+    </script>
+</body>
+</html>

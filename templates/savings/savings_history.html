@@ -1,0 +1,66 @@
+{% extends 'savings/base.html' %}
+
+{% block content %}
+<h2>Your Savings History</h2>
+
+{% if savings_goal %}
+<p>Saving Goal: ₹{{ savings_goal_amount }}</p>
+{% else %}
+<p>No savings goal set.</p>
+{% endif %}
+
+{% if savings_history %}
+<table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Month</th>
+            <th>Cumulative Savings (₹)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in savings_history %}
+        <tr>
+            <td>{{ entry.month }}</td>
+            <td>{{ entry.cumulative_savings|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Savings Progress Chart</h3>
+<canvas id="savingsChart" width="600" height="400"></canvas>
+
+<script src="{% static 'chart.js' %}"></script>
+<script>
+    const ctx = document.getElementById('savingsChart').getContext('2d');
+    const savingsData = {{ savings_data|safe }};
+    const labels = Object.keys(savingsData);
+    const data = Object.values(savingsData);
+
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Cumulative Savings',
+                data: data,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+{% else %}
+<p>No savings history available.</p>
+{% endif %}
+
+{% endblock %}

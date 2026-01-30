@@ -1,0 +1,255 @@
+{% extends 'savings/base.html' %}
+{% load static %}
+
+{% block title %}AI Savings Dashboard{% endblock %}
+
+{% block extra_head %}
+
+<style>
+    /* Dashboard page custom styles */
+    .notification-bell svg {
+        color: red;
+        transition: color 0.3s ease;
+    }
+    .notification-bell:hover svg {
+        color: red;
+    }
+    .notification-dropdown .alert {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    .progress {
+        height: 24px;
+        background-color: #e9ecef;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .progress-bar {
+        font-weight: 600;
+        line-height: 24px;
+        color: #fff;
+        text-align: center;
+        white-space: nowrap;
+        transition: width 0.6s ease;
+    }
+    .bg-success {
+        background-color: var(--color-success) !important;
+    }
+    .bg-danger {
+        background-color: var(--color-warning) !important;
+    }
+    .card-title {
+        font-weight: 700;
+        color: var(--color-primary);
+    }
+    .table thead th {
+        background-color: rgb(83, 83, 232);
+        color: #fff;
+        font-weight: 700;
+    }
+    .table tbody tr {
+        background-color: #f8f9fa;
+        transition: background-color 0.3s ease;
+    }
+    .table tbody tr:hover {
+        background-color: #e9ecef;
+    }
+    .btn-primary {
+        background-color: rgb(28, 196, 28);
+        border-color: var(--color-primary);
+        font-weight: 700;
+    }
+    .btn-primary:hover {
+        background-color: #59f148;
+        border-color: #d9c8cf;
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Financial Dashboard</h1>
+    <div class="notification-bell position-relative" style="cursor:pointer;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
+            <path d="M8 16a2 2 0 0 0 1.985-1.75H6.015A2 2 0 0 0 8 16zm.104-14.995a1 1 0 0 0-2.208 0A5.002 5.002 0 0 0 3 6c0 1.098-.405 2.08-1.05 2.777-.6.63-.95 1.42-.95 2.223v.5a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5v-.5c0-.803-.35-1.593-.95-2.223C13.405 8.08 13 7.098 13 6a5.002 5.002 0 0 0-4.896-4.995zM8 1a4 4 0 0 1 4 4c0 1.098.405 2.08 1.05 2.777.6.63.95 1.42.95 2.223v.5H2v-.5c0-.803.35-1.593.95-2.223C3.595 7.08 4 6.098 4 5a4 4 0 0 1 4-4z"/>
+        </svg>
+        {% if notifications %}
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{ notifications|length }}
+            <span class="visually-hidden">unread notifications</span>
+        </span>
+        {% endif %}
+        <div class="notification-dropdown position-absolute bg-white border rounded shadow p-3" style="display:none; right:0; width: 300px; max-height: 400px; overflow-y: auto; z-index: 1050;">
+            {% if notifications %}
+                {% for note in notifications %}
+                <div class="alert alert-{{ note.type }} alert-dismissible fade show mb-2" role="alert">
+                    {{ note.message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted mb-0">No notifications</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Alerts -->
+{% for alert in alerts %}
+<div class="alert alert-warning alert-custom" role="alert">
+    {{ alert }}
+</div>
+{% endfor %}
+
+<!-- Financial Overview -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Monthly Income</h5>
+                <p class="card-text">₹{{ financial_data.income|default:"0" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Expenses</h5>
+                <p class="card-text">₹{{ total_expenses|default:"0" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Remaining Amount</h5>
+                <p class="card-text">₹{{ remaining_amount|default:"0" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Savings Goal</h5>
+                <p class="card-text">₹{{ savings_goal.target_amount|default:"Not set" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mt-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Your Savings</h5>
+                <p class="card-text">₹{{ savings_goal.current_amount|default:"0" }}</p>
+                <a href="{% url 'add_savings' %}" class="btn btn-sm btn-primary mt-2">Add Savings</a>
+                <a href="{% url 'edit_savings' %}" class="btn btn-sm btn-secondary mt-2 ms-2">Edit Savings</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Budget Progress Section -->
+<div class="card mt-4">
+    <div class="card-body">
+        <h5 class="card-title">Budget Progress</h5>
+        {% if budget_progress %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Month</th>
+                    <th>Monthly Budget</th>
+                    <th>Spent</th>
+                    <th>Progress (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for budget in budget_progress %}
+                <tr>
+                    <td>{{ budget.category|title }}</td>
+                    <td>{{ budget.month }}</td>
+                    <td>₹{{ budget.monthly_budget }}</td>
+                    <td>₹{{ budget.spent }}</td>
+                    <td>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar {% if budget.progress >= 90 %}bg-danger{% else %}bg-success{% endif %}" role="progressbar" style="width: {{ budget.progress }}%;" aria-valuenow="{{ budget.progress }}" aria-valuemin="0" aria-valuemax="100">{{ budget.progress|floatformat:2 }}%</div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No budget progress available.</p>
+        {% endif %}
+    </div>
+</div>
+
+
+<!-- AI Prediction -->
+<div class="card mt-4">
+    <div class="card-body">
+        <h5 class="card-title">AI Savings Recommendation</h5>
+        <p class="savings-prediction">Recommended monthly savings: ₹{{ predicted_savings }}</p>
+        <p class="text-muted">Based on your income and spending patterns</p>
+    </div>
+</div>
+
+<!-- Spending Pattern Chart -->
+<div class="card mt-4">
+    <div class="card-body" style="width: 400px; height: 300px; position: relative; border: 1px solid #ccc;">
+        <h5 class="card-title">Spending Patterns</h5>
+        {% if expense_category_data %}
+        <canvas id="spendingChart" width="400" height="300" style="border: 1px solid red; background-color: #fff;"></canvas>
+        {% else %}
+        <p>No expense data available to display the pie chart.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Monthly Financial Bar Chart -->
+<div class="card mt-4">
+    <div class="card-body" style="width: 600px; height: 400px; position: relative; border: 1px solid #ccc;">
+        <h5 class="card-title">Monthly Income, Expenses, and Savings</h5>
+        <canvas id="monthlyBarChart" width="600" height="400" style="background-color: #fff;"></canvas>
+    </div>
+</div>
+
+<!-- Savings History Section -->
+<div class="card mt-4">
+    <div class="card-body">
+        <h5 class="card-title">Savings History</h5>
+        {% if savings_history %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Cumulative Savings (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in savings_history %}
+                <tr>
+                    <td>{{ entry.month }}</td>
+                    <td>{{ entry.cumulative_savings|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% comment %} Chart removed as per user request {% endcomment %}
+        {% else %}
+        <p>No savings history available.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% comment %} Embed JSON data for charts using json_script for safe parsing {% endcomment %}
+{{ expense_category_data|json_script:"expense-category-data" }}
+{{ income_data|json_script:"income-data" }}
+{{ savings_data|json_script:"savings-data" }}
+
+{% block extra_scripts %}
+<script src="{% static 'chart.js' %}"></script>
+{% endblock %}
+{% endblock %}

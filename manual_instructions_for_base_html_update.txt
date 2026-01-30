@@ -1,0 +1,66 @@
+To manually update your templates/savings/base.html for server-side dark theme persistence, please follow these steps:
+
+1. Modify the <body> tag to conditionally include the dark-theme class based on the theme_preference context variable:
+
+   Replace:
+   <body>
+
+   With:
+   <body{% raw %}{% if theme_preference == 'dark' %} class="dark-theme"{% endif %}{% endraw %}>
+
+2. Replace the existing dark theme toggle JavaScript with the following script that sets a cookie and toggles the theme:
+
+<script>
+    // Function to set cookie
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    }
+
+    // Theme toggle script
+    document.addEventListener('DOMContentLoaded', () => {
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const body = document.body;
+
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                body.classList.add('dark-theme');
+                if (themeToggleBtn) {
+                    themeToggleBtn.innerHTML = '&#9728;'; // sun icon
+                }
+            } else {
+                body.classList.remove('dark-theme');
+                if (themeToggleBtn) {
+                    themeToggleBtn.innerHTML = '&#9788;'; // moon icon
+                }
+            }
+            setCookie('theme', theme, 365);
+        }
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
+                if (currentTheme === 'light') {
+                    setTheme('dark');
+                } else {
+                    setTheme('light');
+                }
+            });
+        }
+    });
+</script>
+
+3. Ensure your Django settings.py includes the context processor:
+
+   'savings.context_processors.theme_preference'
+
+   in the TEMPLATES OPTIONS context_processors list.
+
+This will enable the server to read the theme cookie and apply the dark-theme class on page load, ensuring consistent dark theme across all pages.
+
+If you need further assistance applying these changes, please let me know.

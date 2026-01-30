@@ -1,0 +1,20 @@
+{% extends 'savings/base.html' %}
+
+{% block title %}Edit Savings - AI Savings{% endblock %}
+
+{% block content %}
+<div class="form-container bg-white" style="max-width: 500px; margin: 50px auto; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border-radius: 8px;">
+    <h2 class="text-center mb-4">Edit Savings Amount</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="current_amount" class="form-label">Current Savings Amount (₹)</label>
+            <input type="number" class="form-control" id="current_amount" name="current_amount" required min="0" step="0.01" value="{{ savings_goal.current_amount }}">
+        </div>
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Update Savings</button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
